@@ -6,56 +6,60 @@
 <meta name="robots" content="noindex">
 <title>Vendas do Dia · Vertical Rio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* identidade Vertical Rio (verticalrio.com): preto, branco, cinzas e amarelo #fff345, Plus Jakarta Sans */
 :root {
   color-scheme: light;
-  --bg: #f4f4f2;
-  --card: #fcfcfb;
-  --line: #e4e3df;
-  --ink: #0b0b0b;
-  --ink-2: #52514e;
-  --ink-3: #8a8984;
-  --s1: #2a78d6;   /* Online */
-  --s2: #eb6834;   /* Interno */
-  --s3: #1baf7a;   /* Marketplace */
+  --bg: #f4f4f4;
+  --card: #fcfcfc;
+  --line: #e4e4e4;
+  --ink: #000;
+  --ink-2: #4a4a4a;
+  --ink-3: #787375;
+  --amarelo: #fff345;
+  --s1: #000;      /* Online */
+  --s2: #9e9e9e;   /* Interno */
+  --s3: #d6c800;   /* Marketplace */
+  --barra: #000;
   --good: #1a7f37;
   --bad: #c62f2f;
-  --track: #ebeae6;
+  --track: #e9e9e9;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #111110; --card: #1a1a19; --line: #2c2c2a;
-    --ink: #f0efec; --ink-2: #c3c2b7; --ink-3: #8d8c85;
-    --s1: #3987e5; --s2: #d95926; --s3: #199e70;
-    --good: #4cc27a; --bad: #f07070; --track: #2a2a28;
+    --bg: #000; --card: #0f0f0f; --line: #242424;
+    --ink: #fcfcfc; --ink-2: #c4c4c4; --ink-3: #8a8587;
+    --s1: #fff345; --s2: #9e9e9e; --s3: #5e5a5c; --barra: #fff345;
+    --good: #4cc27a; --bad: #f07070; --track: #1f1f1f;
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #111110; --card: #1a1a19; --line: #2c2c2a;
-  --ink: #f0efec; --ink-2: #c3c2b7; --ink-3: #8d8c85;
-  --s1: #3987e5; --s2: #d95926; --s3: #199e70;
-  --good: #4cc27a; --bad: #f07070; --track: #2a2a28;
+  --bg: #000; --card: #0f0f0f; --line: #242424;
+  --ink: #fcfcfc; --ink-2: #c4c4c4; --ink-3: #8a8587;
+  --s1: #fff345; --s2: #9e9e9e; --s3: #5e5a5c; --barra: #fff345;
+  --good: #4cc27a; --bad: #f07070; --track: #1f1f1f;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
-  font: 15px/1.45 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font: 15px/1.45 "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   font-variant-numeric: tabular-nums;
 }
 main { max-width: 880px; margin: 0 auto; padding: 24px 16px 48px; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 20px; }
 .label { font-size: .8rem; color: var(--ink-2); font-weight: 500; }
 .muted { color: var(--ink-3); font-size: .8rem; }
 button { font: inherit; color: inherit; cursor: pointer; }
 
 /* topo */
 header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
-header h1 { font-size: 1.05rem; margin: 0; font-weight: 600; }
-header h1 span { color: var(--ink-3); font-weight: 500; }
+header h1 { display: flex; align-items: center; gap: 14px; font-size: .8rem; margin: 0; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+header h1 .logo { height: 22px; width: auto; color: var(--ink); }
+header h1 .sep { width: 1px; height: 18px; background: var(--line); }
 .nav { display: flex; align-items: center; gap: 6px; }
 .nav button { background: var(--card); border: 1px solid var(--line); border-radius: 8px; height: 34px; min-width: 34px; padding: 0 10px; }
 .nav button:disabled { opacity: .35; cursor: default; }
@@ -69,6 +73,9 @@ header h1 span { color: var(--ink-3); font-weight: 500; }
 .delta b { font-weight: 600; }
 .delta .up { color: var(--good); }
 .delta .down { color: var(--bad); }
+/* receita bruta em destaque no amarelo da marca */
+.hero .card:first-child { background: var(--amarelo); border-color: var(--amarelo); color: #000; }
+.hero .card:first-child .label, .hero .card:first-child .delta, .hero .card:first-child .delta b { color: #000; }
 .resumo { margin: 12px 2px 20px; color: var(--ink-2); font-size: .9rem; }
 
 /* origem */
@@ -82,7 +89,7 @@ header h1 span { color: var(--ink-3); font-weight: 500; }
 /* semana / ciclo */
 .dois { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
 .prog { height: 6px; background: var(--track); border-radius: 4px; margin-top: 12px; overflow: hidden; }
-.prog div { height: 100%; background: var(--ink-3); border-radius: 4px; }
+.prog div { height: 100%; background: var(--barra); border-radius: 4px; }
 
 /* extras */
 .titulo { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
@@ -95,7 +102,7 @@ header h1 span { color: var(--ink-3); font-weight: 500; }
 .ext .lin .q { color: var(--ink-2); font-size: .85rem; }
 .ext .lin .v { font-weight: 600; min-width: 80px; text-align: right; }
 .ext .lin .t { grid-column: 1 / -1; height: 6px; background: var(--track); border-radius: 4px; overflow: hidden; }
-.ext .lin .t div { height: 100%; background: var(--s1); border-radius: 4px; }
+.ext .lin .t div { height: 100%; background: var(--barra); border-radius: 4px; }
 
 .dois > #x-card { grid-column: 1 / -1; }
 
@@ -129,7 +136,37 @@ header h1 span { color: var(--ink-3); font-weight: 500; }
 <main>
   <section id="painel">
     <header>
-      <h1>Vendas do dia <span>· Vertical Rio</span></h1>
+      <h1><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="logo" role="img" aria-label="Vertical Rio" viewBox="0 0 547.75 179.319">
+<defs>
+<clipPath id="clip-0">
+<path clip-rule="nonzero" d="M 0.910156 1 L 60 1 L 60 178 L 0.910156 178 Z M 0.910156 1 "/>
+</clipPath>
+<clipPath id="clip-1">
+<path clip-rule="nonzero" d="M 236 0 L 284 0 L 284 178.640625 L 236 178.640625 Z M 236 0 "/>
+</clipPath>
+<clipPath id="clip-2">
+<path clip-rule="nonzero" d="M 502 0 L 546.589844 0 L 546.589844 178.640625 L 502 178.640625 Z M 502 0 "/>
+</clipPath>
+</defs>
+<g clip-path="url(#clip-0)">
+<path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 43.835938 1.136719 L 29.820312 117.03125 L 16.1875 1.136719 L 0.910156 1.136719 L 22.246094 177.503906 L 37.269531 177.503906 L 59.238281 1.136719 Z M 43.835938 1.136719 "/>
+</g>
+<path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 105.445312 177.503906 L 64.410156 177.503906 L 64.410156 1.136719 L 105.445312 1.136719 L 105.445312 16.160156 L 79.5625 16.160156 L 79.5625 81.933594 L 101.023438 81.933594 L 101.023438 96.957031 L 79.5625 96.957031 L 79.5625 162.734375 L 105.445312 162.734375 Z M 105.445312 177.503906 "/>
+<path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 142.433594 68.929688 L 142.433594 29.035156 C 142.433594 20.453125 139.574219 16.160156 133.851562 16.160156 L 125.265625 16.160156 L 125.265625 81.933594 L 133.851562 81.933594 C 139.574219 81.933594 142.433594 77.601562 142.433594 68.929688 M 157.585938 177.503906 L 142.433594 177.503906 L 142.433594 109.835938 C 142.433594 101.25 139.574219 96.957031 133.851562 96.957031 L 125.265625 96.957031 L 125.265625 177.503906 L 110.117188 177.503906 L 110.117188 1.136719 L 133.851562 1.136719 C 140.921875 1.136719 146.726562 4.082031 151.273438 9.972656 C 155.480469 15.613281 157.585938 21.96875 157.585938 29.035156 L 157.585938 64.636719 C 157.585938 75.917969 153.457031 84.164062 145.214844 89.382812 C 153.457031 94.601562 157.585938 102.894531 157.585938 114.253906 Z M 157.585938 177.503906 "/>
+<path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 209.472656 16.160156 L 193.3125 16.160156 L 193.3125 177.503906 L 178.289062 177.503906 L 178.289062 16.160156 L 162.132812 16.160156 L 162.132812 1.136719 L 209.472656 1.136719 Z M 209.472656 16.160156 "/>
+<path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 229.292969 177.503906 L 214.144531 177.503906 L 214.144531 1.136719 L 229.292969 1.136719 Z M 229.292969 177.503906 "/>
+<g clip-path="url(#clip-1)">
+<path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 283.707031 150.863281 C 283.707031 158.273438 281.644531 164.671875 277.519531 170.054688 C 272.808594 175.777344 266.957031 178.640625 259.96875 178.640625 C 252.984375 178.640625 247.304688 175.820312 242.929688 170.179688 C 238.550781 164.542969 236.363281 158.105469 236.363281 150.863281 L 236.363281 28.027344 C 236.363281 20.789062 238.550781 14.351562 242.929688 8.710938 C 247.304688 2.902344 252.984375 0 259.96875 0 C 267.042969 0 272.890625 2.945312 277.519531 8.839844 C 281.644531 14.226562 283.707031 20.625 283.707031 28.027344 L 283.707031 48.480469 L 268.683594 48.480469 L 268.683594 28.027344 C 268.683594 19.445312 265.78125 15.148438 259.96875 15.148438 C 257.195312 15.148438 254.960938 16.621094 253.28125 19.566406 C 252.019531 22.007812 251.386719 24.832031 251.386719 28.027344 L 251.386719 150.863281 C 251.386719 154.066406 252.019531 156.839844 253.28125 159.199219 C 254.878906 162.226562 257.109375 163.742188 259.96875 163.742188 C 265.78125 163.742188 268.683594 159.449219 268.683594 150.863281 L 268.683594 130.414062 L 283.707031 130.414062 Z M 283.707031 150.863281 "/>
+</g>
+<path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 325.492188 130.414062 L 317.035156 61.605469 L 308.828125 130.414062 Z M 346.574219 177.503906 L 331.046875 177.503906 L 327.257812 145.4375 L 307.441406 145.4375 L 303.527344 177.503906 L 288.25 177.503906 L 309.585938 1.136719 L 324.609375 1.136719 Z M 346.574219 177.503906 "/>
+<path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 392.78125 177.503906 L 351.75 177.503906 L 351.75 1.136719 L 366.898438 1.136719 L 366.898438 162.734375 L 392.78125 162.734375 Z M 392.78125 177.503906 "/>
+<path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 413.359375 175.609375 L 402.628906 175.609375 L 402.628906 164.878906 L 413.359375 164.878906 Z M 413.359375 175.609375 "/>
+<path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 460.984375 68.464844 L 460.984375 27.601562 C 460.984375 23.898438 460.078125 20.535156 458.269531 17.515625 C 456.199219 13.984375 453.398438 12.214844 449.863281 12.214844 L 438.871094 12.214844 L 438.871094 83.984375 L 449.863281 83.984375 C 453.398438 83.984375 456.199219 82.21875 458.269531 78.679688 C 460.078125 75.75 460.984375 72.34375 460.984375 68.464844 M 471.976562 177.734375 L 460.984375 177.734375 L 460.984375 110.363281 C 460.984375 106.65625 460.078125 103.292969 458.269531 100.277344 C 456.199219 96.742188 453.398438 94.972656 449.863281 94.972656 L 438.871094 94.972656 L 438.871094 177.734375 L 427.882812 177.734375 L 427.882812 1.222656 L 449.863281 1.222656 C 456.5 1.222656 461.972656 4.066406 466.285156 9.753906 C 470.078125 15.015625 471.976562 20.964844 471.976562 27.601562 L 471.976562 64.066406 C 471.976562 69.414062 470.59375 74.589844 467.835938 79.585938 C 465.078125 84.5 461.285156 87.777344 456.457031 89.414062 C 461.285156 91.222656 465.078125 94.542969 467.835938 99.371094 C 470.59375 104.199219 471.976562 109.371094 471.976562 114.890625 Z M 471.976562 177.734375 "/>
+<path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 492.664062 177.734375 L 481.675781 177.734375 L 481.675781 1.222656 L 492.664062 1.222656 Z M 492.664062 177.734375 "/>
+<g clip-path="url(#clip-2)">
+<path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 535.601562 152.386719 L 535.601562 26.566406 C 535.601562 22.773438 534.691406 19.371094 532.882812 16.351562 C 530.898438 12.816406 528.140625 11.046875 524.605469 11.046875 C 521.070312 11.046875 518.269531 12.816406 516.199219 16.351562 C 514.390625 19.371094 513.484375 22.773438 513.484375 26.566406 L 513.484375 152.386719 C 513.484375 156.183594 514.390625 159.546875 516.199219 162.472656 C 518.269531 166.011719 521.070312 167.777344 524.605469 167.777344 C 528.140625 167.777344 530.898438 166.011719 532.882812 162.472656 C 534.691406 159.546875 535.601562 156.183594 535.601562 152.386719 M 546.589844 152.386719 C 546.589844 159.027344 544.691406 164.976562 540.898438 170.234375 C 536.585938 175.839844 531.15625 178.640625 524.605469 178.640625 C 517.96875 178.640625 512.492188 175.839844 508.183594 170.234375 C 504.386719 164.976562 502.496094 159.027344 502.496094 152.386719 L 502.496094 26.566406 C 502.496094 19.757812 504.386719 13.808594 508.183594 8.722656 C 512.40625 2.949219 517.882812 0.0585938 524.605469 0.0585938 C 531.242188 0.0585938 536.671875 2.949219 540.898438 8.722656 C 544.691406 13.808594 546.589844 19.757812 546.589844 26.566406 Z M 546.589844 152.386719 "/>
+</g>
+</svg><span class="sep"></span>Vendas do dia</h1>
       <div class="nav">
         <button id="ant" aria-label="Dia anterior">‹</button>
         <div class="dia" id="dia"></div>
