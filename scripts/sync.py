@@ -79,6 +79,11 @@ for b in bookings:
         "x": [[n, q, round(v, 2)] for n, (q, v) in ext.items()],
         "it": [[i.get("productName") or "?", i.get("totalQuantity") or 0, round(float(i.get("amount") or 0), 2)] for i in itens],
     })
+    cpn = (b.get("coupon") or "").strip().upper() or next(
+        ((p.get("label") or "").strip().upper() for p in pags if p.get("type") == "PROMO_CODE" and (p.get("label") or "").strip()), "")
+    if cpn or cupom:
+        linhas[-1]["c"] = cpn or "SEM CÓDIGO"
+        linhas[-1]["cd"] = round(cupom, 2)  # desconto do cupom
     if linhas[-1]["o"] == "INTERNAL":
         por = b.get("createdBy") or {}
         linhas[-1]["v"] = f"{por.get('firstName', '')} {por.get('lastName', '')}".strip() or "Sem vendedor"

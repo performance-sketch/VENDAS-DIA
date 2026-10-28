@@ -111,7 +111,8 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
 .ext .lin .t { grid-column: 1 / -1; height: 6px; background: var(--track); border-radius: 4px; overflow: hidden; }
 .ext .lin .t div { height: 100%; background: var(--barra); border-radius: 4px; }
 
-.dois > #x-card, .dois > #p-card, .dois > #t-card { grid-column: 1 / -1; }
+.dois > #x-card, .dois > #p-card, .dois > #t-card, .dois > #c-card { grid-column: 1 / -1; }
+.cupom .v { color: var(--bad); }
 
 /* time interno */
 .time { margin-top: 14px; display: grid; gap: 14px; }
@@ -143,6 +144,8 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
   .dois > #x-card { grid-area: 1 / 2; overflow: auto; }
   .dois > #p-card { grid-area: 2 / 2; overflow: auto; }
   .dois > #t-card { grid-area: 1 / 3 / 3 / 4; overflow: auto; }
+  .dois.com-cupom > #t-card { grid-area: 1 / 3; }
+  .dois > #c-card { grid-area: 2 / 3; overflow: auto; }
   .nota { margin: 0; font-size: .7rem; }
 }
 #tela, #tema { font-size: .8rem; }
@@ -241,6 +244,15 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
         <div class="muted tot" id="t-tot"></div>
         <div class="time" id="t-lista"></div>
       </div>
+      <div class="card" id="c-card" hidden>
+        <div class="titulo">
+          <div class="label">Cupons de desconto</div>
+          <div class="seg" id="c-seg">
+            <button data-p="dia" class="on">Dia</button><button data-p="semana">Semana</button><button data-p="ciclo">Ciclo</button>
+          </div>
+        </div>
+        <div class="ext cupom" id="c-lista"></div>
+      </div>
     </div>
 
     <div class="card resumo" id="d-resumo"></div>
@@ -256,7 +268,7 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
 const ORIGENS = [['ONLINE', 'Online', '--s1'], ['INTERNAL', 'Interno', '--s2'], ['MARKETPLACE', 'Marketplace', '--s3']];
 const DSEM = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
 const MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-let R = [], DESDE = '', ULT = '', CORTE = '', D = '', xPer = 'dia', tPer = 'dia', pPer = 'dia';
+let R = [], DESDE = '', ULT = '', CORTE = '', D = '', xPer = 'dia', tPer = 'dia', pPer = 'dia', cPer = 'dia';
 
 // ── datas (strings YYYY-MM-DD) ───────────────────────────────────────────────
 const dt = s => new Date(s + 'T12:00:00Z');
@@ -280,7 +292,7 @@ const corte = s => s === ULT ? CORTE : '24:00';
 
 // soma as reservas de [de, ate]; no último dia só até o horário 'ate_h'
 function soma(de, ate, ate_h) {
-  const a = { b: 0, l: 0, e: 0, n: 0, px: 0, o: {}, x: {}, v: {}, pr: {} };
+  const a = { b: 0, l: 0, e: 0, n: 0, px: 0, o: {}, x: {}, v: {}, pr: {}, c: {} };
   for (const r of R) {
     if (r.d < de || r.d > ate || (r.d === ate && r.h > ate_h)) continue;
     a.b += r.b; a.l += r.l; a.e += r.e; a.n++; a.px += r.px;
@@ -294,6 +306,10 @@ function soma(de, ate, ate_h) {
     for (const [prod, q, v] of r.it || []) {
       const sp = a.pr[prod] || (a.pr[prod] = { q: 0, n: 0, v: 0 });
       sp.q += q; sp.n++; sp.v += v || 0;
+    }
+    if (r.c) {
+      const sc = a.c[r.c] || (a.c[r.c] = { n: 0, d: 0, b: 0 });
+      sc.n++; sc.d += r.cd || 0; sc.b += r.b;
     }
     if (r.v) {
       const sv = a.v[r.v] || (a.v[r.v] = { b: 0, f: 0, e: 0, n: 0, px: 0, p: {} });
@@ -379,6 +395,7 @@ function render() {
   renderExtras();
   renderProdutos();
   renderTime();
+  renderCupons();
 }
 
 function renderExtras() {
@@ -445,6 +462,23 @@ function renderProdutos() {
     : '<div class="muted">Nenhum produto vendido no período.</div>';
 }
 
+// cupons: o card só aparece se houve cupom no ciclo do dia selecionado
+function renderCupons() {
+  const usado = Object.keys(periodo('ciclo').atual.c).length > 0;
+  document.getElementById('c-card').hidden = !usado;
+  document.querySelector('.dois').classList.toggle('com-cupom', usado);
+  if (!usado) return;
+  const lista = Object.entries(periodo(cPer).atual.c).sort((a, b) => b[1].n - a[1].n || b[1].d - a[1].d);
+  const max = lista.length ? lista[0][1].n : 1;
+  document.getElementById('c-lista').innerHTML = lista.length
+    ? lista.map(([nome, v]) => `
+      <div class="lin">
+        <span class="n">${nome}</span><span class="q">${plural(v.n, 'uso')} · ${brl(v.b)} em reservas</span><span class="v">−${brl(v.d)}</span>
+        <div class="t"><div style="width:${v.n / max * 100}%"></div></div>
+      </div>`).join('')
+    : '<div class="muted">Nenhum cupom usado no período.</div>';
+}
+
 function renderTime() {
   const s = periodo(tPer).atual, int = s.o.INTERNAL || { v: 0, n: 0 };
   const lista = Object.entries(s.v).sort((a, b) => b[1].b - a[1].b);
@@ -503,6 +537,12 @@ document.getElementById('p-seg').onclick = ev => {
   pPer = p;
   for (const b of ev.currentTarget.children) b.classList.toggle('on', b.dataset.p === p);
   renderProdutos();
+};
+document.getElementById('c-seg').onclick = ev => {
+  const p = ev.target.dataset.p; if (!p) return;
+  cPer = p;
+  for (const b of ev.currentTarget.children) b.classList.toggle('on', b.dataset.p === p);
+  renderCupons();
 };
 document.getElementById('t-seg').onclick = ev => {
   const p = ev.target.dataset.p; if (!p) return;
