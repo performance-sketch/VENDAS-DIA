@@ -322,10 +322,28 @@ msg["From"] = f"Vendas do Dia · Vertical Rio <{USER}>"
 msg["To"] = ", ".join(PARA)
 msg.set_content(texto_simples())
 msg.add_alternative(html, subtype="html")
-with smtplib.SMTP_SSL(os.environ.get("SMTP_HOST", "smtp.gmail.com"), int(os.environ.get("SMTP_PORT", "465"))) as s:
+# diagnóstico sem expor a senha (os logs do Actions são públicos): só tamanho e tipo de caractere
+print(f"remetente {USER} · senha com {len(SENHA)} caracteres · só letras: {SENHA.isalpha()} · ascii: {SENHA.isascii()}")
+
+
+def enviar(s):
+    s.ehlo()
+    print("métodos de login do servidor:", s.esmtp_features.get("auth", "?"))
     try:
         s.login(USER, SENHA)
     except smtplib.SMTPAuthenticationError as e:
         sys.exit(f"login recusado pelo Gmail ({e.smtp_code}): confira a senha de app de {USER}")
     s.send_message(msg)
+
+
+HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+try:
+    with smtplib.SMTP_SSL(HOST, 465, timeout=30) as s:
+        enviar(s)
+except smtplib.SMTPServerDisconnected as e:
+    print(f"porta 465 caiu ({e}); tentando 587 com STARTTLS")
+    with smtplib.SMTP(HOST, 587, timeout=30) as s:
+        s.ehlo()
+        s.starttls()
+        enviar(s)
 print(f"enviado para {len(PARA)} destinatário(s) · {assunto}")
