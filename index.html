@@ -71,6 +71,7 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
 .valor { font-size: 1.7rem; font-weight: 600; letter-spacing: -.01em; margin: 4px 0 2px; white-space: nowrap; }
 .delta { font-size: .8rem; color: var(--ink-3); }
 .delta b { font-weight: 600; }
+.deltas { display: grid; gap: 2px; }
 .delta .up { color: var(--good); }
 .delta .down { color: var(--bad); }
 /* receita bruta em destaque no amarelo da marca */
@@ -104,7 +105,17 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
 .ext .lin .t { grid-column: 1 / -1; height: 6px; background: var(--track); border-radius: 4px; overflow: hidden; }
 .ext .lin .t div { height: 100%; background: var(--barra); border-radius: 4px; }
 
-.dois > #x-card { grid-column: 1 / -1; }
+.dois > #x-card, .dois > #t-card { grid-column: 1 / -1; }
+
+/* time interno */
+.time { margin-top: 14px; display: grid; gap: 14px; }
+.time .tot { margin-top: 6px; }
+.time .lin { display: grid; grid-template-columns: 1fr auto; gap: 2px 16px; align-items: baseline; }
+.time .lin .n { font-weight: 600; }
+.time .lin .v { font-weight: 600; text-align: right; }
+.time .lin .det { grid-column: 1 / -1; color: var(--ink-2); font-size: .8rem; }
+.time .lin .t { grid-column: 1 / -1; height: 4px; background: var(--track); border-radius: 4px; overflow: hidden; margin-top: 4px; }
+.time .lin .t div { height: 100%; background: var(--barra); border-radius: 4px; }
 
 /* telas largas (monitor/TV): ocupa a tela inteira, sem rolagem */
 @media (min-width: 1000px) and (min-height: 600px) {
@@ -112,14 +123,18 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
   main { max-width: none; height: 100vh; padding: 2.5vh 2.5vw; }
   #painel:not([hidden]) { display: flex; flex-direction: column; gap: 1.6vh; height: 100%; }
   header, .resumo { margin: 0; }
-  .hero { flex: 1.3; min-height: 0; }
-  .dois { flex: 1.2; min-height: 0; margin: 0; grid-template-columns: 1fr 1fr 1.15fr; }
+  .hero { flex: 1; min-height: 0; }
+  .dois { flex: 1.8; min-height: 0; margin: 0; grid-template-columns: 1fr 1fr 1.5fr; grid-template-rows: 1fr 1fr; }
+  .dois .valor { font-size: 1.9rem; margin: 2px 0; }
+  .dois .prog { margin-top: 8px; }
   .card { display: flex; flex-direction: column; justify-content: center; padding: 2.2vh 1.6vw; }
   .hero .card { justify-content: space-between; }
   .dois .card { justify-content: flex-start; }
   .hero .card:first-child .valor { font-size: 4rem; }
   .valor { font-size: 2.4rem; }
-  .dois > #x-card { grid-column: auto; justify-content: flex-start; overflow: auto; }
+  #c-semana { grid-area: 1 / 1; } #c-ciclo { grid-area: 2 / 1; }
+  .dois > #x-card { grid-area: 1 / 2 / 3 / 3; overflow: auto; }
+  .dois > #t-card { grid-area: 1 / 3 / 3 / 4; overflow: auto; }
   .nota { margin: 0; font-size: .7rem; }
 }
 #tela { font-size: .8rem; }
@@ -177,9 +192,9 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
     </header>
 
     <div class="hero">
-      <div class="card"><div class="label">Receita bruta</div><div class="valor" id="d-b"></div><div class="delta" id="d-b-d"></div></div>
-      <div class="card"><div class="label">Receita líquida</div><div class="valor" id="d-l"></div><div class="delta" id="d-l-d"></div></div>
-      <div class="card"><div class="label">Extras</div><div class="valor" id="d-e"></div><div class="delta" id="d-e-d"></div></div>
+      <div class="card"><div class="label">Receita bruta</div><div class="valor" id="d-b"></div><div class="deltas"><div class="delta" id="d-b-o"></div><div class="delta" id="d-b-d"></div></div></div>
+      <div class="card"><div class="label">Receita líquida</div><div class="valor" id="d-l"></div><div class="deltas"><div class="delta" id="d-l-o"></div><div class="delta" id="d-l-d"></div></div></div>
+      <div class="card"><div class="label">Extras</div><div class="valor" id="d-e"></div><div class="deltas"><div class="delta" id="d-e-o"></div><div class="delta" id="d-e-d"></div></div></div>
     </div>
     <div class="resumo" id="d-resumo"></div>
 
@@ -201,6 +216,16 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
       </div>
       <div class="ext" id="x-lista"></div>
       </div>
+      <div class="card" id="t-card">
+        <div class="titulo">
+          <div class="label">Time interno</div>
+          <div class="seg" id="t-seg">
+            <button data-p="dia" class="on">Dia</button><button data-p="semana">Semana</button><button data-p="ciclo">Ciclo</button>
+          </div>
+        </div>
+        <div class="muted tot" id="t-tot"></div>
+        <div class="time" id="t-lista"></div>
+      </div>
     </div>
 
     <p class="muted nota" style="margin-top:16px">
@@ -214,7 +239,7 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
 const ORIGENS = [['ONLINE', 'Online', '--s1'], ['INTERNAL', 'Interno', '--s2'], ['MARKETPLACE', 'Marketplace', '--s3']];
 const DSEM = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
 const MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-let R = [], DESDE = '', ULT = '', CORTE = '', D = '', xPer = 'dia';
+let R = [], DESDE = '', ULT = '', CORTE = '', D = '', xPer = 'dia', tPer = 'dia';
 
 // ── datas (strings YYYY-MM-DD) ───────────────────────────────────────────────
 const dt = s => new Date(s + 'T12:00:00Z');
@@ -238,7 +263,7 @@ const corte = s => s === ULT ? CORTE : '24:00';
 
 // soma as reservas de [de, ate]; no último dia só até o horário 'ate_h'
 function soma(de, ate, ate_h) {
-  const a = { b: 0, l: 0, e: 0, n: 0, px: 0, o: {}, x: {} };
+  const a = { b: 0, l: 0, e: 0, n: 0, px: 0, o: {}, x: {}, v: {} };
   for (const r of R) {
     if (r.d < de || r.d > ate || (r.d === ate && r.h > ate_h)) continue;
     a.b += r.b; a.l += r.l; a.e += r.e; a.n++; a.px += r.px;
@@ -248,6 +273,11 @@ function soma(de, ate, ate_h) {
     for (const [nome, q, v] of r.x) {
       const sx = a.x[nome] || (a.x[nome] = { q: 0, v: 0 });
       sx.q += q; sx.v += v;
+    }
+    if (r.v) {
+      const sv = a.v[r.v] || (a.v[r.v] = { b: 0, e: 0, n: 0, px: 0, p: {} });
+      sv.b += r.b; sv.e += r.e; sv.n++; sv.px += r.px;
+      for (const [prod, q] of r.it || []) sv.p[prod] = (sv.p[prod] || 0) + q;
     }
   }
   return a;
@@ -284,8 +314,13 @@ function render() {
   document.getElementById('hoje').hidden = D === ULT;
 
   const p = periodo('dia'), a = p.atual, b = p.ant;
+  // dia anterior, até o mesmo horário
+  const ontem = addD(D, -1);
+  const o = ontem >= DESDE ? soma(ontem, ontem, corte(D)) : null;
+  const nomeOntem = D === ULT ? 'ontem' : 'dia anterior';
   for (const k of ['b', 'l', 'e']) {
     document.getElementById('d-' + k).textContent = brl(a[k]);
+    document.getElementById('d-' + k + '-o').innerHTML = o ? delta(a[k], o[k], nomeOntem) : '';
     document.getElementById('d-' + k + '-d').innerHTML = b ? delta(a[k], b[k], p.nome) : '';
   }
   document.getElementById('d-resumo').innerHTML = a.n
@@ -325,6 +360,7 @@ function render() {
       ${prog}`;
   }
   renderExtras();
+  renderTime();
 }
 
 function renderExtras() {
@@ -338,6 +374,26 @@ function renderExtras() {
         <div class="t"><div style="width:${v.q / max * 100}%"></div></div>
       </div>`).join('')
     : '<div class="muted">Nenhum extra vendido no período.</div>';
+}
+
+function renderTime() {
+  const s = periodo(tPer).atual, int = s.o.INTERNAL || { v: 0, n: 0 };
+  const lista = Object.entries(s.v).sort((a, b) => b[1].b - a[1].b);
+  const max = lista.length ? lista[0][1].b : 1;
+  document.getElementById('t-tot').textContent = int.n
+    ? `${brl(int.v)} · ${int.n} reserva${int.n > 1 ? 's' : ''} · ${s.b ? Math.round(int.v / s.b * 100) : 0}% da receita bruta`
+    : '';
+  document.getElementById('t-lista').innerHTML = lista.length
+    ? lista.map(([nome, v]) => {
+        const prods = Object.entries(v.p).sort((a, b) => b[1] - a[1])
+          .map(([p, q]) => `${q}× ${p.replace(' | ', ' ')}`).join(' · ');
+        return `<div class="lin">
+          <span class="n">${nome}</span><span class="v">${brl(v.b)}</span>
+          <span class="det">${v.n} reserva${v.n > 1 ? 's' : ''} · ${v.px} pax${v.e ? ' · extras ' + brl(v.e) : ''}${prods ? ' · ' + prods : ''}</span>
+          <div class="t"><div style="width:${v.b / max * 100}%"></div></div>
+        </div>`;
+      }).join('')
+    : '<div class="muted">Nenhuma venda interna no período.</div>';
 }
 
 // ── dados ────────────────────────────────────────────────────────────────────
@@ -357,6 +413,12 @@ document.getElementById('ant').onclick = () => { D = addD(D, -1); render(); };
 document.getElementById('prox').onclick = () => { D = addD(D, 1); render(); };
 document.getElementById('tela').onclick = () => document.documentElement.requestFullscreen?.();
 document.getElementById('hoje').onclick = () => { D = ULT; render(); };
+document.getElementById('t-seg').onclick = ev => {
+  const p = ev.target.dataset.p; if (!p) return;
+  tPer = p;
+  for (const b of ev.currentTarget.children) b.classList.toggle('on', b.dataset.p === p);
+  renderTime();
+};
 document.getElementById('x-seg').onclick = ev => {
   const p = ev.target.dataset.p; if (!p) return;
   xPer = p;

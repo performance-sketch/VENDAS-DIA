@@ -1,8 +1,8 @@
 """Busca no Rezdy as reservas criadas nos últimos ~75 dias e gera dados.js (aberto, sem senha).
 
 Uso: REZDY_API_KEY=... python scripts/sync.py
-Grava só agregados por reserva (data/hora da criação, valores, pax, origem, extras):
-nenhum nome, e-mail, telefone ou número de pedido.
+Grava por reserva: data/hora da criação, valores, pax, origem, produtos, extras e, nas internas,
+o vendedor (quem criou no Rezdy). Nenhum dado de cliente (nome, e-mail, telefone) nem número de pedido.
 """
 import json
 import os
@@ -76,7 +76,11 @@ for b in bookings:
         "px": sum(i.get("totalQuantity") or 0 for i in itens),
         "o": (b.get("source") or "ONLINE").upper(),
         "x": [[n, q, round(v, 2)] for n, (q, v) in ext.items()],
+        "it": [[i.get("productName") or "?", i.get("totalQuantity") or 0] for i in itens],
     })
+    if linhas[-1]["o"] == "INTERNAL":
+        por = b.get("createdBy") or {}
+        linhas[-1]["v"] = f"{por.get('firstName', '')} {por.get('lastName', '')}".strip() or "Sem vendedor"
 linhas.sort(key=lambda r: (r["d"], r["h"]))
 
 dados = {"desde": str(desde), "atualizado": agora.strftime("%Y-%m-%d %H:%M"), "r": linhas}
