@@ -111,7 +111,7 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
 .ext .lin .t { grid-column: 1 / -1; height: 6px; background: var(--track); border-radius: 4px; overflow: hidden; }
 .ext .lin .t div { height: 100%; background: var(--barra); border-radius: 4px; }
 
-.dois > #x-card, .dois > #t-card { grid-column: 1 / -1; }
+.dois > #x-card, .dois > #p-card, .dois > #t-card { grid-column: 1 / -1; }
 
 /* time interno */
 .time { margin-top: 14px; display: grid; gap: 14px; }
@@ -140,7 +140,8 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
   .dois .card { justify-content: flex-start; }
   .valor { font-size: 2.4rem; }
   #c-semana { grid-area: 1 / 1; } #c-ciclo { grid-area: 2 / 1; }
-  .dois > #x-card { grid-area: 1 / 2 / 3 / 3; overflow: auto; }
+  .dois > #x-card { grid-area: 1 / 2; overflow: auto; }
+  .dois > #p-card { grid-area: 2 / 2; overflow: auto; }
   .dois > #t-card { grid-area: 1 / 3 / 3 / 4; overflow: auto; }
   .nota { margin: 0; font-size: .7rem; }
 }
@@ -193,7 +194,6 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
         <button id="ant" aria-label="Dia anterior">‹</button>
         <div class="dia" id="dia"></div>
         <button id="prox" aria-label="Próximo dia">›</button>
-        <button id="hoje">Hoje</button>
         <button id="tema" title="Alternar modo claro/escuro"></button>
         <button id="tela" title="Tela cheia">⛶ Tela cheia</button>
       </div>
@@ -222,6 +222,15 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
       </div>
       <div class="ext" id="x-lista"></div>
       </div>
+      <div class="card" id="p-card">
+        <div class="titulo">
+          <div class="label">Produtos vendidos</div>
+          <div class="seg" id="p-seg">
+            <button data-p="dia" class="on">Dia</button><button data-p="semana">Semana</button><button data-p="ciclo">Ciclo</button>
+          </div>
+        </div>
+        <div class="ext" id="p-lista"></div>
+      </div>
       <div class="card" id="t-card">
         <div class="titulo">
           <div class="label">Time interno</div>
@@ -237,7 +246,7 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
     <div class="card resumo" id="d-resumo"></div>
 
     <p class="muted nota" style="margin-top:16px">
-      Reservas confirmadas, pela data em que foram feitas. Bruta = valor total da reserva · Líquida = bruta − cortesias (FOC, free of charge) − cupons · Time interno: com FOC = bruta, sem FOC = bruta − cortesias · Extras = Shoe-Selfie Pass, GoPro, 360º etc.
+      Reservas confirmadas, pela data em que foram feitas. Bruta = valor total da reserva · Líquida = bruta − cortesias (FOC, free of charge) − cupons · Time interno: com FOC = bruta, sem FOC = bruta − cortesias · Extras = Shoe-Selfie Pass, GoPro, 360º etc. · Produtos vendidos: valor só do voo, sem extras e taxas.
       Comparações até o mesmo horário do período anterior. Ciclo = dia 26 a 25. <span id="atualizado"></span>
     </p>
   </section>
@@ -247,7 +256,7 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
 const ORIGENS = [['ONLINE', 'Online', '--s1'], ['INTERNAL', 'Interno', '--s2'], ['MARKETPLACE', 'Marketplace', '--s3']];
 const DSEM = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
 const MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-let R = [], DESDE = '', ULT = '', CORTE = '', D = '', xPer = 'dia', tPer = 'dia';
+let R = [], DESDE = '', ULT = '', CORTE = '', D = '', xPer = 'dia', tPer = 'dia', pPer = 'dia';
 
 // ── datas (strings YYYY-MM-DD) ───────────────────────────────────────────────
 const dt = s => new Date(s + 'T12:00:00Z');
@@ -271,7 +280,7 @@ const corte = s => s === ULT ? CORTE : '24:00';
 
 // soma as reservas de [de, ate]; no último dia só até o horário 'ate_h'
 function soma(de, ate, ate_h) {
-  const a = { b: 0, l: 0, e: 0, n: 0, px: 0, o: {}, x: {}, v: {} };
+  const a = { b: 0, l: 0, e: 0, n: 0, px: 0, o: {}, x: {}, v: {}, pr: {} };
   for (const r of R) {
     if (r.d < de || r.d > ate || (r.d === ate && r.h > ate_h)) continue;
     a.b += r.b; a.l += r.l; a.e += r.e; a.n++; a.px += r.px;
@@ -281,6 +290,10 @@ function soma(de, ate, ate_h) {
     for (const [nome, q, v] of r.x) {
       const sx = a.x[nome] || (a.x[nome] = { q: 0, v: 0 });
       sx.q += q; sx.v += v;
+    }
+    for (const [prod, q, v] of r.it || []) {
+      const sp = a.pr[prod] || (a.pr[prod] = { q: 0, n: 0, v: 0 });
+      sp.q += q; sp.n++; sp.v += v || 0;
     }
     if (r.v) {
       const sv = a.v[r.v] || (a.v[r.v] = { b: 0, f: 0, e: 0, n: 0, px: 0, p: {} });
@@ -319,7 +332,6 @@ function render() {
   document.getElementById('dia').textContent = (D === ULT ? 'Hoje · ' : '') + fDia(D);
   document.getElementById('prox').disabled = D >= ULT;
   document.getElementById('ant').disabled = D <= DESDE;
-  document.getElementById('hoje').hidden = D === ULT;
 
   const p = periodo('dia'), a = p.atual, b = p.ant;
   // dia anterior, até o mesmo horário
@@ -365,6 +377,7 @@ function render() {
       ${prog}`;
   }
   renderExtras();
+  renderProdutos();
   renderTime();
 }
 
@@ -420,6 +433,18 @@ function resumoExecutivo(a, o, b, nomeOntem, nomeSem) {
   return '<span class="tit">Resumo do dia</span><div>' + frases.join(' ') + '</div>';
 }
 
+function renderProdutos() {
+  const lista = Object.entries(periodo(pPer).atual.pr).sort((a, b) => b[1].q - a[1].q || b[1].v - a[1].v);
+  const max = lista.length ? lista[0][1].q : 1;
+  document.getElementById('p-lista').innerHTML = lista.length
+    ? lista.map(([nome, v]) => `
+      <div class="lin">
+        <span class="n">${nome}</span><span class="q">${v.q} pax · ${plural(v.n, 'reserva')}</span><span class="v">${brl(v.v)}</span>
+        <div class="t"><div style="width:${v.q / max * 100}%"></div></div>
+      </div>`).join('')
+    : '<div class="muted">Nenhum produto vendido no período.</div>';
+}
+
 function renderTime() {
   const s = periodo(tPer).atual, int = s.o.INTERNAL || { v: 0, n: 0 };
   const lista = Object.entries(s.v).sort((a, b) => b[1].b - a[1].b);
@@ -473,7 +498,12 @@ document.getElementById('tema').onclick = () => {
   try { localStorage.setItem('vendasdia_tema', novo); } catch (e) {}
 };
 document.getElementById('tela').onclick = () => document.documentElement.requestFullscreen?.();
-document.getElementById('hoje').onclick = () => { D = ULT; render(); };
+document.getElementById('p-seg').onclick = ev => {
+  const p = ev.target.dataset.p; if (!p) return;
+  pPer = p;
+  for (const b of ev.currentTarget.children) b.classList.toggle('on', b.dataset.p === p);
+  renderProdutos();
+};
 document.getElementById('t-seg').onclick = ev => {
   const p = ev.target.dataset.p; if (!p) return;
   tPer = p;

@@ -77,7 +77,7 @@ for b in bookings:
         "px": sum(i.get("totalQuantity") or 0 for i in itens),
         "o": (b.get("source") or "ONLINE").upper(),
         "x": [[n, q, round(v, 2)] for n, (q, v) in ext.items()],
-        "it": [[i.get("productName") or "?", i.get("totalQuantity") or 0] for i in itens],
+        "it": [[i.get("productName") or "?", i.get("totalQuantity") or 0, round(float(i.get("amount") or 0), 2)] for i in itens],
     })
     if linhas[-1]["o"] == "INTERNAL":
         por = b.get("createdBy") or {}
