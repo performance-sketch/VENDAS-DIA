@@ -13,7 +13,7 @@ Origem = campo `source` do Rezdy (INTERNAL = interno; MARKETPLACE_* = marketplac
 
 ## E-mail diário
 
-`scripts/email_resumo.py` monta o resumo do dia anterior (mesmas regras do painel) e envia por SMTP do Gmail.
-Action `email.yml` roda todo dia às 08:00 (Rio). Secrets: `SMTP_USER` (conta Google que envia),
-`SMTP_PASS` (senha de app dessa conta), `EMAIL_PARA` (destinatários, separados por vírgula).
-Prévia sem enviar: `python scripts/email_resumo.py --preview resumo.html`.
+A cada sync, `scripts/email_resumo.py --saida email` grava `email/ontem.html` e `email/ontem.json`
+(resumo do dia anterior, mesmas regras do painel). O envio é feito pelo Google Apps Script
+`apps-script/Codigo.gs`, instalado na conta automacao.verticalrio@gmail.com: todo dia às 8h (Rio)
+ele lê esses arquivos e envia com MailApp para performance@verticalrio.com. Sem senha de app.

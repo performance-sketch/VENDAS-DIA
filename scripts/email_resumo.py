@@ -1,6 +1,7 @@
 """Envia por e-mail o resumo de vendas do dia anterior, com as mesmas regras do painel.
 
 Uso:
+  python scripts/email_resumo.py --saida email            # grava email/ontem.html e ontem.json (usado no dia a dia)
   python scripts/email_resumo.py --preview arquivo.html   # só gera o HTML, não envia
   SMTP_USER=... SMTP_PASS=... EMAIL_PARA=... python scripts/email_resumo.py
 
@@ -301,6 +302,17 @@ def texto_simples():
 
 html = montar()
 assunto = f"Vendas de ontem ({DSEM[D.weekday()]}, {f_curto(D)}): {brl(dia['b'])} · {plural(dia['n'], 'reserva')}"
+
+# --saida pasta: grava ontem.html e ontem.json (lidos pelo Google Apps Script que envia o e-mail)
+if "--saida" in sys.argv:
+    pasta = sys.argv[sys.argv.index("--saida") + 1]
+    os.makedirs(pasta, exist_ok=True)
+    with open(os.path.join(pasta, "ontem.html"), "w", encoding="utf-8") as f:
+        f.write(html)
+    with open(os.path.join(pasta, "ontem.json"), "w", encoding="utf-8") as f:
+        json.dump({"dia": str(D), "assunto": assunto, "texto": texto_simples()}, f, ensure_ascii=False)
+    print(f"resumo de {D} gravado em {pasta} · {assunto}")
+    sys.exit(0)
 
 if "--preview" in sys.argv:
     saida = sys.argv[sys.argv.index("--preview") + 1]
