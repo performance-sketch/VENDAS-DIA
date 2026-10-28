@@ -309,7 +309,9 @@ if "--preview" in sys.argv:
     print(f"prévia gravada em {saida} · assunto: {assunto}")
     sys.exit(0)
 
-USER, SENHA = os.environ.get("SMTP_USER"), os.environ.get("SMTP_PASS")
+# a senha de app do Google aparece em blocos com espaços; ignora espaços e quebras de linha coladas junto
+USER = (os.environ.get("SMTP_USER") or "").strip()
+SENHA = re.sub(r"\s", "", os.environ.get("SMTP_PASS") or "")
 PARA = [e.strip() for e in (os.environ.get("EMAIL_PARA") or "").split(",") if e.strip()]
 if not (USER and SENHA and PARA):
     sys.exit("defina SMTP_USER, SMTP_PASS e EMAIL_PARA")
@@ -321,6 +323,9 @@ msg["To"] = ", ".join(PARA)
 msg.set_content(texto_simples())
 msg.add_alternative(html, subtype="html")
 with smtplib.SMTP_SSL(os.environ.get("SMTP_HOST", "smtp.gmail.com"), int(os.environ.get("SMTP_PORT", "465"))) as s:
-    s.login(USER, SENHA)
+    try:
+        s.login(USER, SENHA)
+    except smtplib.SMTPAuthenticationError as e:
+        sys.exit(f"login recusado pelo Gmail ({e.smtp_code}): confira a senha de app de {USER}")
     s.send_message(msg)
 print(f"enviado para {len(PARA)} destinatário(s) · {assunto}")
