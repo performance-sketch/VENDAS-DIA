@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* identidade Vertical Rio (verticalrio.com): preto, branco, cinzas e amarelo #fff345, Plus Jakarta Sans */
+/* identidade Vertical Rio (verticalrio.com): preto, branco/off-white e cinzas, Plus Jakarta Sans */
 :root {
   color-scheme: light;
   --bg: #f4f4f4;
@@ -17,10 +17,11 @@
   --ink: #000;
   --ink-2: #4a4a4a;
   --ink-3: #787375;
-  --amarelo: #fff345;
+  --dest-bg: #000;      /* card de destaque (receita bruta): invertido */
+  --dest-ink: #fcfcfc;
   --s1: #000;      /* Online */
   --s2: #9e9e9e;   /* Interno */
-  --s3: #d6c800;   /* Marketplace */
+  --s3: #c4c4c4;   /* Marketplace */
   --barra: #000;
   --good: #1a7f37;
   --bad: #c62f2f;
@@ -31,16 +32,18 @@
     color-scheme: dark;
     --bg: #000; --card: #0f0f0f; --line: #242424;
     --ink: #fcfcfc; --ink-2: #c4c4c4; --ink-3: #8a8587;
-    --s1: #fff345; --s2: #9e9e9e; --s3: #5e5a5c; --barra: #fff345;
+    --s1: #f4f4f4; --s2: #787375; --s3: #4a4a4a; --barra: #f4f4f4;
     --good: #4cc27a; --bad: #f07070; --track: #1f1f1f;
+    --dest-bg: #f4f4f4; --dest-ink: #000;
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
   --bg: #000; --card: #0f0f0f; --line: #242424;
   --ink: #fcfcfc; --ink-2: #c4c4c4; --ink-3: #8a8587;
-  --s1: #fff345; --s2: #9e9e9e; --s3: #5e5a5c; --barra: #fff345;
+  --s1: #f4f4f4; --s2: #787375; --s3: #4a4a4a; --barra: #f4f4f4;
   --good: #4cc27a; --bad: #f07070; --track: #1f1f1f;
+    --dest-bg: #f4f4f4; --dest-ink: #000;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -74,10 +77,13 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
 .deltas { display: grid; gap: 2px; }
 .delta .up { color: var(--good); }
 .delta .down { color: var(--bad); }
-/* receita bruta em destaque no amarelo da marca */
-.hero .card:first-child { background: var(--amarelo); border-color: var(--amarelo); color: #000; }
-.hero .card:first-child .label, .hero .card:first-child .delta, .hero .card:first-child .delta b { color: #000; }
-.resumo { margin: 12px 2px 20px; color: var(--ink-2); font-size: .9rem; }
+/* receita bruta em destaque: card invertido (off-white no modo escuro) */
+.hero .card:first-child { background: var(--dest-bg); border-color: var(--dest-bg); color: var(--dest-ink); }
+.hero .card:first-child .label, .hero .card:first-child .delta, .hero .card:first-child .delta b { color: var(--dest-ink); }
+.origem { margin: 12px 0; }
+.resumo { margin-top: 12px; border-left: 3px solid var(--barra); color: var(--ink-2); font-size: .88rem; line-height: 1.55; }
+.resumo .tit { display: block; font-size: .8rem; font-weight: 500; color: var(--ink-2); margin-bottom: 6px; }
+.resumo b { color: var(--ink); font-weight: 600; }
 
 /* origem */
 .barra { display: flex; gap: 2px; height: 14px; margin: 14px 0 12px; }
@@ -112,32 +118,33 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
 .time .tot { margin-top: 6px; }
 .time .lin { display: grid; grid-template-columns: 1fr auto; gap: 2px 16px; align-items: baseline; }
 .time .lin .n { font-weight: 600; }
-.time .lin .v { font-weight: 600; text-align: right; }
-.time .lin .det { grid-column: 1 / -1; color: var(--ink-2); font-size: .8rem; }
+.time .lin .v { font-weight: 600; text-align: right; grid-row: span 2; line-height: 1.35; }
+.time .lin .v small { font-weight: 400; font-size: .7rem; color: var(--ink-3); }
+.time .lin .det { grid-column: 1; color: var(--ink-2); font-size: .8rem; }
 .time .lin .t { grid-column: 1 / -1; height: 4px; background: var(--track); border-radius: 4px; overflow: hidden; margin-top: 4px; }
 .time .lin .t div { height: 100%; background: var(--barra); border-radius: 4px; }
 
 /* telas largas (monitor/TV): ocupa a tela inteira, sem rolagem */
 @media (min-width: 1000px) and (min-height: 600px) {
-  html { font-size: clamp(15px, 1.75vh, 26px); }
-  main { max-width: none; height: 100vh; padding: 2.5vh 2.5vw; }
-  #painel:not([hidden]) { display: flex; flex-direction: column; gap: 1.6vh; height: 100%; }
-  header, .resumo { margin: 0; }
-  .hero { flex: 1; min-height: 0; }
-  .dois { flex: 1.8; min-height: 0; margin: 0; grid-template-columns: 1fr 1fr 1.5fr; grid-template-rows: 1fr 1fr; }
+  html { font-size: clamp(12px, 1.5vh, 24px); }
+  main { max-width: none; min-height: 100vh; padding: 2.5vh 2.5vw; display: flex; flex-direction: column; }
+  #painel:not([hidden]) { display: flex; flex-direction: column; gap: 1.6vh; flex: 1; }
+  header, .origem, .resumo { margin: 0; }
+  .hero { flex: 1 0 auto; }
+  .hero .card:first-child .valor { font-size: 3.4rem; }
+  .dois { flex: 1.8 0 auto; margin: 0; grid-template-columns: 1fr 1fr 1.5fr; grid-template-rows: 1fr 1fr; }
   .dois .valor { font-size: 1.9rem; margin: 2px 0; }
   .dois .prog { margin-top: 8px; }
   .card { display: flex; flex-direction: column; justify-content: center; padding: 2.2vh 1.6vw; }
   .hero .card { justify-content: space-between; }
   .dois .card { justify-content: flex-start; }
-  .hero .card:first-child .valor { font-size: 4rem; }
   .valor { font-size: 2.4rem; }
   #c-semana { grid-area: 1 / 1; } #c-ciclo { grid-area: 2 / 1; }
   .dois > #x-card { grid-area: 1 / 2 / 3 / 3; overflow: auto; }
   .dois > #t-card { grid-area: 1 / 3 / 3 / 4; overflow: auto; }
   .nota { margin: 0; font-size: .7rem; }
 }
-#tela { font-size: .8rem; }
+#tela, #tema { font-size: .8rem; }
 :fullscreen #tela, :fullscreen .nota { display: none; }
 
 @media (max-width: 640px) {
@@ -187,6 +194,7 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
         <div class="dia" id="dia"></div>
         <button id="prox" aria-label="Próximo dia">›</button>
         <button id="hoje">Hoje</button>
+        <button id="tema" title="Alternar modo claro/escuro"></button>
         <button id="tela" title="Tela cheia">⛶ Tela cheia</button>
       </div>
     </header>
@@ -196,9 +204,7 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
       <div class="card"><div class="label">Receita líquida</div><div class="valor" id="d-l"></div><div class="deltas"><div class="delta" id="d-l-o"></div><div class="delta" id="d-l-d"></div></div></div>
       <div class="card"><div class="label">Extras</div><div class="valor" id="d-e"></div><div class="deltas"><div class="delta" id="d-e-o"></div><div class="delta" id="d-e-d"></div></div></div>
     </div>
-    <div class="resumo" id="d-resumo"></div>
-
-    <div class="card">
+    <div class="card origem">
       <div class="label">Origem das vendas do dia</div>
       <div class="barra" id="o-barra"></div>
       <div class="legenda" id="o-leg"></div>
@@ -228,8 +234,10 @@ header h1 .sep { width: 1px; height: 18px; background: var(--line); }
       </div>
     </div>
 
+    <div class="card resumo" id="d-resumo"></div>
+
     <p class="muted nota" style="margin-top:16px">
-      Reservas confirmadas, pela data em que foram feitas. Bruta = valor total da reserva · Líquida = bruta − cortesias (FOC) − cupons · Extras = Shoe-Selfie Pass, GoPro, 360º etc.
+      Reservas confirmadas, pela data em que foram feitas. Bruta = valor total da reserva · Líquida = bruta − cortesias (FOC, free of charge) − cupons · Time interno: com FOC = bruta, sem FOC = bruta − cortesias · Extras = Shoe-Selfie Pass, GoPro, 360º etc.
       Comparações até o mesmo horário do período anterior. Ciclo = dia 26 a 25. <span id="atualizado"></span>
     </p>
   </section>
@@ -268,15 +276,15 @@ function soma(de, ate, ate_h) {
     if (r.d < de || r.d > ate || (r.d === ate && r.h > ate_h)) continue;
     a.b += r.b; a.l += r.l; a.e += r.e; a.n++; a.px += r.px;
     const o = r.o.startsWith('MARKETPLACE') ? 'MARKETPLACE' : (r.o === 'INTERNAL' ? 'INTERNAL' : 'ONLINE');
-    const so = a.o[o] || (a.o[o] = { v: 0, n: 0 });
-    so.v += r.b; so.n++;
+    const so = a.o[o] || (a.o[o] = { v: 0, f: 0, n: 0 });
+    so.v += r.b; so.f += r.f || 0; so.n++;
     for (const [nome, q, v] of r.x) {
       const sx = a.x[nome] || (a.x[nome] = { q: 0, v: 0 });
       sx.q += q; sx.v += v;
     }
     if (r.v) {
-      const sv = a.v[r.v] || (a.v[r.v] = { b: 0, e: 0, n: 0, px: 0, p: {} });
-      sv.b += r.b; sv.e += r.e; sv.n++; sv.px += r.px;
+      const sv = a.v[r.v] || (a.v[r.v] = { b: 0, f: 0, e: 0, n: 0, px: 0, p: {} });
+      sv.b += r.b; sv.f += r.f || 0; sv.e += r.e; sv.n++; sv.px += r.px;
       for (const [prod, q] of r.it || []) sv.p[prod] = (sv.p[prod] || 0) + q;
     }
   }
@@ -287,7 +295,7 @@ function soma(de, ate, ate_h) {
 function periodo(tipo) {
   const h = corte(D);
   let de, ate = D, pde, pate, nome;
-  if (tipo === 'dia') { de = D; pde = pate = addD(D, -7); nome = DSEM[dt(D).getUTCDay()] + ' passada'; }
+  if (tipo === 'dia') { de = D; pde = pate = addD(D, -7); const w = dt(D).getUTCDay(); nome = DSEM[w] + (w === 0 || w === 6 ? ' passado' : ' passada'); }
   if (tipo === 'semana') { de = segunda(D); pde = addD(de, -7); pate = addD(D, -7); nome = 'semana anterior'; }
   if (tipo === 'ciclo') {
     de = inicioCiclo(D); pde = cicloAnterior(de);
@@ -323,10 +331,7 @@ function render() {
     document.getElementById('d-' + k + '-o').innerHTML = o ? delta(a[k], o[k], nomeOntem) : '';
     document.getElementById('d-' + k + '-d').innerHTML = b ? delta(a[k], b[k], p.nome) : '';
   }
-  document.getElementById('d-resumo').innerHTML = a.n
-    ? `<b>${a.n}</b> reserva${a.n > 1 ? 's' : ''} · <b>${a.px}</b> pax · ticket médio <b>${brl(a.b / a.n)}</b>` +
-      (D === ULT ? ` <span class="muted">· até ${CORTE}</span>` : '')
-    : 'Nenhuma reserva confirmada neste dia' + (D === ULT ? ` até ${CORTE}` : '') + '.';
+  document.getElementById('d-resumo').innerHTML = resumoExecutivo(a, o, b, nomeOntem, p.nome);
 
   // origem
   const tot = a.b || 1;
@@ -376,19 +381,59 @@ function renderExtras() {
     : '<div class="muted">Nenhum extra vendido no período.</div>';
 }
 
+// ── resumo executivo: texto gerado a partir dos números ─────────────────────
+const plural = (n, s) => `${n} ${s}${n === 1 ? '' : 's'}`;
+const artigo = nome => nome === 'ontem' ? 'de ontem'
+  : nome.endsWith('passado') || nome.endsWith(' anterior') && !nome.startsWith('semana') ? 'do ' + nome : 'da ' + nome;
+function compara(atual, ant, nome) {
+  if (ant == null) return '';
+  if (!ant) return atual ? `sem vendas ${nome === 'ontem' ? 'ontem' : 'na comparação ' + artigo(nome)} até esse horário` : '';
+  const d = (atual - ant) / ant;
+  if (Math.abs(d) < .005) return `igual ao valor ${artigo(nome)}`;
+  return `<b>${pct(d)} ${d > 0 ? 'acima' : 'abaixo'}</b> ${artigo(nome)}`;
+}
+function resumoExecutivo(a, o, b, nomeOntem, nomeSem) {
+  const quando = D === ULT ? `Até ${CORTE}` : `Em ${fDia(D)}`;
+  const frases = [];
+  const comps = [compara(a.b, o && o.b, nomeOntem), compara(a.b, b && b.b, nomeSem)].filter(Boolean);
+  if (!a.n) {
+    frases.push(`${quando}, nenhuma reserva confirmada${o && o.n ? ` (${nomeOntem === 'ontem' ? 'ontem' : 'no dia anterior'}, até esse horário: <b>${brl(o.b)}</b>)` : ''}.`);
+  } else {
+    frases.push(`${quando}, o dia soma <b>${brl(a.b)}</b> em vendas brutas, com ${plural(a.n, 'reserva')} e ${a.px} pax` +
+      ` (ticket médio de ${brl(a.b / a.n)})${comps.length ? ': ' + comps.join(' e ') : ''}.`);
+    const int = a.o.INTERNAL, onl = a.o.ONLINE;
+    const top = Object.entries(a.v).sort((x, y) => y[1].b - x[1].b)[0];
+    if (int && onl) {
+      frases.push(`O time interno respondeu por <b>${Math.round(int.v / a.b * 100)}%</b> (${brl(int.v)})` +
+        (top ? `, com destaque para <b>${top[0]}</b> (${brl(top[1].b)} em ${plural(top[1].n, 'reserva')})` : '') +
+        `; o online trouxe ${brl(onl.v)} em ${plural(onl.n, 'reserva')}.`);
+    } else if (int) {
+      frases.push(`Todas as vendas vieram do time interno` + (top ? `, com destaque para <b>${top[0]}</b> (${brl(top[1].b)})` : '') + '.');
+    } else if (onl) {
+      frases.push(`Todas as vendas vieram do online.`);
+    }
+    const ext = Object.entries(a.x).sort((x, y) => y[1].v - x[1].v).map(([n, v]) => `${v.q}× ${n}`).join(', ');
+    const desc = a.b - a.l;
+    frases.push((a.e ? `Extras somaram <b>${brl(a.e)}</b> (${ext}). ` : 'Nenhum extra vendido. ') +
+      `A receita líquida ficou em <b>${brl(a.l)}</b>` + (desc > 0.5 ? `, depois de ${brl(desc)} em cortesias e cupons.` : '.'));
+  }
+  return '<span class="tit">Resumo do dia</span><div>' + frases.join(' ') + '</div>';
+}
+
 function renderTime() {
   const s = periodo(tPer).atual, int = s.o.INTERNAL || { v: 0, n: 0 };
   const lista = Object.entries(s.v).sort((a, b) => b[1].b - a[1].b);
   const max = lista.length ? lista[0][1].b : 1;
   document.getElementById('t-tot').textContent = int.n
-    ? `${brl(int.v)} · ${int.n} reserva${int.n > 1 ? 's' : ''} · ${s.b ? Math.round(int.v / s.b * 100) : 0}% da receita bruta`
+    ? `${brl(int.v)} com FOC · ${brl(int.v - int.f)} sem FOC · ${int.n} reserva${int.n > 1 ? 's' : ''} · ${s.b ? Math.round(int.v / s.b * 100) : 0}% da receita bruta`
     : '';
   document.getElementById('t-lista').innerHTML = lista.length
     ? lista.map(([nome, v]) => {
         const prods = Object.entries(v.p).sort((a, b) => b[1] - a[1])
           .map(([p, q]) => `${q}× ${p.replace(' | ', ' ')}`).join(' · ');
         return `<div class="lin">
-          <span class="n">${nome}</span><span class="v">${brl(v.b)}</span>
+          <span class="n">${nome}</span>
+          <span class="v">${brl(v.b)} <small>com FOC</small><br>${brl(v.b - v.f)} <small>sem FOC</small></span>
           <span class="det">${v.n} reserva${v.n > 1 ? 's' : ''} · ${v.px} pax${v.e ? ' · extras ' + brl(v.e) : ''}${prods ? ' · ' + prods : ''}</span>
           <div class="t"><div style="width:${v.b / max * 100}%"></div></div>
         </div>`;
@@ -411,6 +456,22 @@ async function carregar() {
 
 document.getElementById('ant').onclick = () => { D = addD(D, -1); render(); };
 document.getElementById('prox').onclick = () => { D = addD(D, 1); render(); };
+// modo claro / escuro: segue o sistema até a pessoa escolher; a escolha fica neste aparelho
+const escuroSistema = () => matchMedia('(prefers-color-scheme: dark)').matches;
+function aplicaTema(t) {
+  if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
+  const escuro = t ? t === 'dark' : escuroSistema();
+  document.getElementById('tema').textContent = escuro ? '☀ Modo claro' : '☾ Modo escuro';
+}
+let temaSalvo = null;
+try { temaSalvo = localStorage.getItem('vendasdia_tema'); } catch (e) {}
+aplicaTema(temaSalvo);
+document.getElementById('tema').onclick = () => {
+  const atual = document.documentElement.dataset.theme || (escuroSistema() ? 'dark' : 'light');
+  const novo = atual === 'dark' ? 'light' : 'dark';
+  aplicaTema(novo);
+  try { localStorage.setItem('vendasdia_tema', novo); } catch (e) {}
+};
 document.getElementById('tela').onclick = () => document.documentElement.requestFullscreen?.();
 document.getElementById('hoje').onclick = () => { D = ULT; render(); };
 document.getElementById('t-seg').onclick = ev => {

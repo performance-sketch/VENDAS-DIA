@@ -72,6 +72,7 @@ for b in bookings:
         "h": criado.strftime("%H:%M"),
         "b": round(bruta, 2),
         "l": round(bruta - foc - cupom, 2),  # mesma regra do REPORTCLAUDE: vendas − FOC − cupom
+        "f": round(foc, 2),  # cortesias (free of charge)
         "e": round(sum(v for _, v in ext.values()), 2),
         "px": sum(i.get("totalQuantity") or 0 for i in itens),
         "o": (b.get("source") or "ONLINE").upper(),
