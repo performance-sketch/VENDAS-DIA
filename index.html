@@ -194,7 +194,6 @@ header h1 span { color: var(--ink-3); font-weight: 500; }
   </section>
 </main>
 
-<script src="dados.js"></script>
 <script>
 const CHAVE_LS = 'vendasdia_senha';
 const ORIGENS = [['ONLINE', 'Online', '--s1'], ['INTERNAL', 'Interno', '--s2'], ['MARKETPLACE', 'Marketplace', '--s3']];
@@ -327,15 +326,24 @@ function renderExtras() {
 }
 
 // ── senha ────────────────────────────────────────────────────────────────────
-async function abrir(senha) {
+// baixa sempre a versão mais nova de dados.js (o GitHub Pages deixa o navegador guardar em cache)
+async function baixar() {
+  const t = await (await fetch('dados.js?t=' + Date.now(), { cache: 'no-store' })).text();
+  return JSON.parse(t.match(/const COFRE=(\{.*\});/)[1]);
+}
+
+let SENHA = null;
+async function abrir(senha, COFRE) {
+  COFRE = COFRE || await baixar();
   const b = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
   const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(senha), 'PBKDF2', false, ['deriveKey']);
   const k = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b(COFRE.salt), iterations: COFRE.it, hash: 'SHA-256' },
     km, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
   const dados = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b(COFRE.iv) }, k, b(COFRE.ct))));
-  R = dados.r; DESDE = dados.desde;
+  const ultAnt = ULT;
+  R = dados.r; DESDE = dados.desde; SENHA = senha;
   [ULT, CORTE] = dados.atualizado.split(' ');
-  D = ULT;
+  if (!D || D === ultAnt) D = ULT;   // na atualização automática, mantém o dia que está sendo visto
   document.getElementById('atualizado').textContent = `Dados de ${fCurto(ULT)} às ${CORTE}.`;
   document.getElementById('porta').hidden = true;
   document.getElementById('painel').hidden = false;
@@ -362,6 +370,12 @@ document.getElementById('x-seg').onclick = ev => {
   for (const b of ev.currentTarget.children) b.classList.toggle('on', b.dataset.p === p);
   renderExtras();
 };
+
+// atualização automática a cada 5 min (para deixar aberto na TV)
+setInterval(async () => {
+  if (!SENHA) return;
+  try { await abrir(SENHA); } catch (e) {}
+}, 5 * 60 * 1000);
 
 (async () => {
   let salva = null;
