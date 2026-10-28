@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Vendas do Dia · Vertical Rio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f4f2;
+  --card: #fcfcfb;
+  --line: #e4e3df;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --ink-3: #8a8984;
+  --s1: #2a78d6;   /* Online */
+  --s2: #eb6834;   /* Interno */
+  --s3: #1baf7a;   /* Marketplace */
+  --good: #1a7f37;
+  --bad: #c62f2f;
+  --track: #ebeae6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111110; --card: #1a1a19; --line: #2c2c2a;
+    --ink: #f0efec; --ink-2: #c3c2b7; --ink-3: #8d8c85;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+    --good: #4cc27a; --bad: #f07070; --track: #2a2a28;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111110; --card: #1a1a19; --line: #2c2c2a;
+  --ink: #f0efec; --ink-2: #c3c2b7; --ink-3: #8d8c85;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+  --good: #4cc27a; --bad: #f07070; --track: #2a2a28;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.45 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+main { max-width: 880px; margin: 0 auto; padding: 24px 16px 48px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+.label { font-size: .8rem; color: var(--ink-2); font-weight: 500; }
+.muted { color: var(--ink-3); font-size: .8rem; }
+button { font: inherit; color: inherit; cursor: pointer; }
+
+/* topo */
+header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+header h1 { font-size: 1.05rem; margin: 0; font-weight: 600; }
+header h1 span { color: var(--ink-3); font-weight: 500; }
+.nav { display: flex; align-items: center; gap: 6px; }
+.nav button { background: var(--card); border: 1px solid var(--line); border-radius: 8px; height: 34px; min-width: 34px; padding: 0 10px; }
+.nav button:disabled { opacity: .35; cursor: default; }
+.nav .dia { min-width: 150px; text-align: center; font-weight: 600; }
+
+/* dia */
+.hero { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 12px; }
+.hero .card:first-child .valor { font-size: 2.6rem; }
+.valor { font-size: 1.7rem; font-weight: 600; letter-spacing: -.01em; margin: 4px 0 2px; white-space: nowrap; }
+.delta { font-size: .8rem; color: var(--ink-3); }
+.delta b { font-weight: 600; }
+.delta .up { color: var(--good); }
+.delta .down { color: var(--bad); }
+.resumo { margin: 12px 2px 20px; color: var(--ink-2); font-size: .9rem; }
+
+/* origem */
+.barra { display: flex; gap: 2px; height: 14px; margin: 14px 0 12px; }
+.barra div { border-radius: 4px; min-width: 4px; }
+.legenda { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.legenda .it { display: flex; align-items: baseline; gap: 8px; font-size: .9rem; }
+.legenda i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; transform: translateY(1px); }
+.legenda b { font-weight: 600; }
+
+/* semana / ciclo */
+.dois { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+.prog { height: 6px; background: var(--track); border-radius: 4px; margin-top: 12px; overflow: hidden; }
+.prog div { height: 100%; background: var(--ink-3); border-radius: 4px; }
+
+/* extras */
+.titulo { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.seg { display: inline-flex; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 2px; }
+.seg button { border: 0; background: none; padding: 4px 12px; border-radius: 6px; font-size: .8rem; color: var(--ink-2); }
+.seg button.on { background: var(--card); color: var(--ink); font-weight: 600; box-shadow: 0 0 0 1px var(--line); }
+.ext { margin-top: 14px; display: grid; gap: 12px; }
+.ext .lin { display: grid; grid-template-columns: 1fr auto auto; gap: 4px 16px; align-items: baseline; }
+.ext .lin .n { font-weight: 500; }
+.ext .lin .q { color: var(--ink-2); font-size: .85rem; }
+.ext .lin .v { font-weight: 600; min-width: 80px; text-align: right; }
+.ext .lin .t { grid-column: 1 / -1; height: 6px; background: var(--track); border-radius: 4px; overflow: hidden; }
+.ext .lin .t div { height: 100%; background: var(--s1); border-radius: 4px; }
+
+/* senha */
+#porta { min-height: 80vh; display: grid; place-items: center; }
+#porta form { width: 100%; max-width: 340px; display: grid; gap: 12px; }
+#porta input[type=password] { font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
+#porta button { background: var(--ink); color: var(--card); border: 0; border-radius: 8px; padding: 10px; font-weight: 600; }
+#porta .erro { color: var(--bad); font-size: .85rem; min-height: 1.2em; }
+#porta label { display: flex; gap: 8px; align-items: center; font-size: .85rem; color: var(--ink-2); }
+
+@media (max-width: 640px) {
+  .hero, .dois { grid-template-columns: 1fr; }
+  .hero .card:first-child .valor { font-size: 2.2rem; }
+  .nav .dia { min-width: 120px; }
+}
+</style>
+</head>
+<body>
+<main>
+  <section id="porta">
+    <form class="card" id="fporta">
+      <div>
+        <div style="font-weight:600">Vendas do dia · Vertical Rio</div>
+        <div class="muted">Os valores são protegidos. Digite a senha para abrir.</div>
+      </div>
+      <input id="senha" type="password" autocomplete="current-password" placeholder="Senha" required>
+      <label><input type="checkbox" id="lembrar"> Lembrar neste aparelho</label>
+      <button>Abrir</button>
+      <div class="erro" id="erro"></div>
+    </form>
+  </section>
+
+  <section id="painel" hidden>
+    <header>
+      <h1>Vendas do dia <span>· Vertical Rio</span></h1>
+      <div class="nav">
+        <button id="ant" aria-label="Dia anterior">‹</button>
+        <div class="dia" id="dia"></div>
+        <button id="prox" aria-label="Próximo dia">›</button>
+        <button id="hoje">Hoje</button>
+      </div>
+    </header>
+
+    <div class="hero">
+      <div class="card"><div class="label">Receita bruta</div><div class="valor" id="d-b"></div><div class="delta" id="d-b-d"></div></div>
+      <div class="card"><div class="label">Receita líquida</div><div class="valor" id="d-l"></div><div class="delta" id="d-l-d"></div></div>
+      <div class="card"><div class="label">Extras</div><div class="valor" id="d-e"></div><div class="delta" id="d-e-d"></div></div>
+    </div>
+    <div class="resumo" id="d-resumo"></div>
+
+    <div class="card">
+      <div class="label">Origem das vendas do dia</div>
+      <div class="barra" id="o-barra"></div>
+      <div class="legenda" id="o-leg"></div>
+    </div>
+
+    <div class="dois">
+      <div class="card" id="c-semana"></div>
+      <div class="card" id="c-ciclo"></div>
+    </div>
+
+    <div class="card">
+      <div class="titulo">
+        <div class="label">Extras mais vendidos</div>
+        <div class="seg" id="x-seg">
+          <button data-p="dia" class="on">Dia</button><button data-p="semana">Semana</button><button data-p="ciclo">Ciclo</button>
+        </div>
+      </div>
+      <div class="ext" id="x-lista"></div>
+    </div>
+
+    <p class="muted" style="margin-top:16px">
+      Reservas confirmadas, pela data em que foram feitas. Bruta = valor total da reserva · Líquida = bruta − cortesias (FOC) − cupons · Extras = Shoe-Selfie Pass, GoPro, 360º etc.
+      Comparações até o mesmo horário do período anterior. Ciclo = dia 26 a 25. <span id="atualizado"></span>
+    </p>
+  </section>
+</main>
+
+<script src="dados.js"></script>
+<script>
+const CHAVE_LS = 'vendasdia_senha';
+const ORIGENS = [['ONLINE', 'Online', '--s1'], ['INTERNAL', 'Interno', '--s2'], ['MARKETPLACE', 'Marketplace', '--s3']];
+const DSEM = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+const MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+let R = [], DESDE = '', ULT = '', CORTE = '', D = '', xPer = 'dia';
+
+// ── datas (strings YYYY-MM-DD) ───────────────────────────────────────────────
+const dt = s => new Date(s + 'T12:00:00Z');
+const addD = (s, n) => { const d = dt(s); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const diff = (a, b) => Math.round((dt(b) - dt(a)) / 864e5);
+const segunda = s => addD(s, -((dt(s).getUTCDay() + 6) % 7));
+const dia26 = (y, m) => { const d = new Date(Date.UTC(y, m - 1, 26, 12)); return d.toISOString().slice(0, 10); };
+function inicioCiclo(s) {
+  const y = +s.slice(0, 4), m = +s.slice(5, 7);
+  return +s.slice(8) >= 26 ? dia26(y, m) : dia26(y, m - 1);
+}
+const cicloAnterior = cs => dia26(+cs.slice(0, 4), +cs.slice(5, 7) - 1);
+const fimCiclo = cs => addD(dia26(+cs.slice(0, 4), +cs.slice(5, 7) + 1), -1);
+const fDia = s => `${DSEM[dt(s).getUTCDay()]}, ${+s.slice(8)} ${MES[+s.slice(5, 7) - 1]}`;
+const fCurto = s => `${s.slice(8)}/${s.slice(5, 7)}`;
+
+// ── números ──────────────────────────────────────────────────────────────────
+const brl = v => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
+const pct = v => Math.abs(Math.round(v * 100)) + '%';
+const corte = s => s === ULT ? CORTE : '24:00';
+
+// soma as reservas de [de, ate]; no último dia só até o horário 'ate_h'
+function soma(de, ate, ate_h) {
+  const a = { b: 0, l: 0, e: 0, n: 0, px: 0, o: {}, x: {} };
+  for (const r of R) {
+    if (r.d < de || r.d > ate || (r.d === ate && r.h > ate_h)) continue;
+    a.b += r.b; a.l += r.l; a.e += r.e; a.n++; a.px += r.px;
+    const o = r.o.startsWith('MARKETPLACE') ? 'MARKETPLACE' : (r.o === 'INTERNAL' ? 'INTERNAL' : 'ONLINE');
+    const so = a.o[o] || (a.o[o] = { v: 0, n: 0 });
+    so.v += r.b; so.n++;
+    for (const [nome, q, v] of r.x) {
+      const sx = a.x[nome] || (a.x[nome] = { q: 0, v: 0 });
+      sx.q += q; sx.v += v;
+    }
+  }
+  return a;
+}
+
+// período atual e o equivalente anterior, cortados no mesmo horário
+function periodo(tipo) {
+  const h = corte(D);
+  let de, ate = D, pde, pate, nome;
+  if (tipo === 'dia') { de = D; pde = pate = addD(D, -7); nome = DSEM[dt(D).getUTCDay()] + ' passada'; }
+  if (tipo === 'semana') { de = segunda(D); pde = addD(de, -7); pate = addD(D, -7); nome = 'semana anterior'; }
+  if (tipo === 'ciclo') {
+    de = inicioCiclo(D); pde = cicloAnterior(de);
+    pate = addD(pde, diff(de, D));
+    if (pate > fimCiclo(pde)) pate = fimCiclo(pde);
+    nome = 'ciclo anterior';
+  }
+  return { de, ate, nome, atual: soma(de, ate, h), ant: pde >= DESDE ? soma(pde, pate, h) : null };
+}
+
+function delta(atual, ant, nome) {
+  if (ant == null) return '';
+  if (!ant) return atual ? 'sem vendas no período anterior' : '';
+  const d = (atual - ant) / ant;
+  const cls = d >= 0 ? 'up' : 'down';
+  return `<b class="${cls}">${d >= 0 ? '▲' : '▼'} ${pct(d)}</b> vs ${nome} (${brl(ant)})`;
+}
+
+// ── render ───────────────────────────────────────────────────────────────────
+function render() {
+  document.getElementById('dia').textContent = (D === ULT ? 'Hoje · ' : '') + fDia(D);
+  document.getElementById('prox').disabled = D >= ULT;
+  document.getElementById('ant').disabled = D <= DESDE;
+  document.getElementById('hoje').hidden = D === ULT;
+
+  const p = periodo('dia'), a = p.atual, b = p.ant;
+  for (const k of ['b', 'l', 'e']) {
+    document.getElementById('d-' + k).textContent = brl(a[k]);
+    document.getElementById('d-' + k + '-d').innerHTML = b ? delta(a[k], b[k], p.nome) : '';
+  }
+  document.getElementById('d-resumo').innerHTML = a.n
+    ? `<b>${a.n}</b> reserva${a.n > 1 ? 's' : ''} · <b>${a.px}</b> pax · ticket médio <b>${brl(a.b / a.n)}</b>` +
+      (D === ULT ? ` <span class="muted">· até ${CORTE}</span>` : '')
+    : 'Nenhuma reserva confirmada neste dia' + (D === ULT ? ` até ${CORTE}` : '') + '.';
+
+  // origem
+  const tot = a.b || 1;
+  document.getElementById('o-barra').innerHTML = a.n
+    ? ORIGENS.filter(([k]) => a.o[k]?.v).map(([k, nome, cor]) =>
+        `<div title="${nome}: ${brl(a.o[k].v)} · ${a.o[k].n} reservas" style="flex:${a.o[k].v};background:var(${cor})"></div>`).join('')
+    : '<div style="flex:1;background:var(--track)"></div>';
+  document.getElementById('o-leg').innerHTML = ORIGENS.filter(([k]) => k !== 'MARKETPLACE' || a.o[k]).map(([k, nome, cor]) => {
+    const o = a.o[k] || { v: 0, n: 0 };
+    return `<div class="it"><i style="background:var(${cor})"></i>${nome} <b>${brl(o.v)}</b>
+      <span class="muted">${o.n} reserva${o.n === 1 ? '' : 's'}${a.b ? ' · ' + Math.round(o.v / tot * 100) + '%' : ''}</span></div>`;
+  }).join('');
+
+  // semana e ciclo
+  for (const tipo of ['semana', 'ciclo']) {
+    const q = periodo(tipo), s = q.atual;
+    let titulo, prog = '';
+    if (tipo === 'semana') {
+      titulo = `Semana · seg ${fCurto(q.de)} → ${fCurto(q.ate)}`;
+    } else {
+      const fim = fimCiclo(q.de), n = diff(q.de, fim) + 1, k = diff(q.de, D) + 1;
+      titulo = `Ciclo · ${fCurto(q.de)} → ${fCurto(fim)}`;
+      prog = `<div class="prog" title="dia ${k} de ${n}"><div style="width:${k / n * 100}%"></div></div>
+              <div class="muted" style="margin-top:6px">dia ${k} de ${n}</div>`;
+    }
+    document.getElementById('c-' + tipo).innerHTML = `
+      <div class="label">${titulo}</div>
+      <div class="valor">${brl(s.b)}</div>
+      <div class="delta">${q.ant ? delta(s.b, q.ant.b, q.nome) : '<span class="muted">sem dados do período anterior</span>'}</div>
+      <div class="muted" style="margin-top:8px">líquida ${brl(s.l)} · extras ${brl(s.e)} · ${s.n} reservas · ${s.px} pax</div>
+      ${prog}`;
+  }
+  renderExtras();
+}
+
+function renderExtras() {
+  const x = periodo(xPer).atual.x;
+  const lista = Object.entries(x).sort((a, b) => b[1].q - a[1].q || b[1].v - a[1].v);
+  const max = lista.length ? lista[0][1].q : 1;
+  document.getElementById('x-lista').innerHTML = lista.length
+    ? lista.map(([nome, v]) => `
+      <div class="lin">
+        <span class="n">${nome}</span><span class="q">${v.q} un.</span><span class="v">${brl(v.v)}</span>
+        <div class="t"><div style="width:${v.q / max * 100}%"></div></div>
+      </div>`).join('')
+    : '<div class="muted">Nenhum extra vendido no período.</div>';
+}
+
+// ── senha ────────────────────────────────────────────────────────────────────
+async function abrir(senha) {
+  const b = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(senha), 'PBKDF2', false, ['deriveKey']);
+  const k = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b(COFRE.salt), iterations: COFRE.it, hash: 'SHA-256' },
+    km, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+  const dados = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b(COFRE.iv) }, k, b(COFRE.ct))));
+  R = dados.r; DESDE = dados.desde;
+  [ULT, CORTE] = dados.atualizado.split(' ');
+  D = ULT;
+  document.getElementById('atualizado').textContent = `Dados de ${fCurto(ULT)} às ${CORTE}.`;
+  document.getElementById('porta').hidden = true;
+  document.getElementById('painel').hidden = false;
+  render();
+}
+
+document.getElementById('fporta').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const senha = document.getElementById('senha').value;
+  try {
+    await abrir(senha);
+    if (document.getElementById('lembrar').checked) try { localStorage.setItem(CHAVE_LS, senha); } catch (e) {}
+  } catch (e) {
+    document.getElementById('erro').textContent = 'Senha incorreta.';
+  }
+});
+document.getElementById('ant').onclick = () => { D = addD(D, -1); render(); };
+document.getElementById('prox').onclick = () => { D = addD(D, 1); render(); };
+document.getElementById('hoje').onclick = () => { D = ULT; render(); };
+document.getElementById('x-seg').onclick = ev => {
+  const p = ev.target.dataset.p; if (!p) return;
+  xPer = p;
+  for (const b of ev.currentTarget.children) b.classList.toggle('on', b.dataset.p === p);
+  renderExtras();
+};
+
+(async () => {
+  let salva = null;
+  try { salva = localStorage.getItem(CHAVE_LS); } catch (e) {}
+  if (salva) try { await abrir(salva); } catch (e) { try { localStorage.removeItem(CHAVE_LS); } catch (e2) {} }
+})();
+</script>
+</body>
+</html>
