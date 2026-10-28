@@ -20,12 +20,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install cryptography
-      - name: Buscar reservas na Rezdy (valores criptografados)
+      - name: Buscar reservas na Rezdy
         run: python scripts/sync.py
         env:
           REZDY_API_KEY: ${{ secrets.REZDY_API_KEY }}
-          SENHA_PAINEL: ${{ secrets.SENHA_PAINEL }}
       - name: Commit se mudou
         run: |
           git config user.name "github-actions[bot]"

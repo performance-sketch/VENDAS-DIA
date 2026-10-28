@@ -1,11 +1,9 @@
-"""Busca no Rezdy as reservas criadas nos últimos ~75 dias e gera dados.js (criptografado).
+"""Busca no Rezdy as reservas criadas nos últimos ~75 dias e gera dados.js (aberto, sem senha).
 
-Uso: REZDY_API_KEY=... SENHA_PAINEL=... python scripts/sync.py
+Uso: REZDY_API_KEY=... python scripts/sync.py
 Grava só agregados por reserva (data/hora da criação, valores, pax, origem, extras):
-nenhum nome, e-mail, telefone ou número de pedido. Sem SENHA_PAINEL o script falha,
-para nunca publicar valores em texto aberto.
+nenhum nome, e-mail, telefone ou número de pedido.
 """
-import base64
 import json
 import os
 import sys
@@ -16,21 +14,14 @@ import urllib.request
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-
 API = "https://api.rezdy.com/v1/"
 TZ = timezone(timedelta(hours=-3))  # America/Sao_Paulo (sem horário de verão)
 DIAS = 75  # cobre o ciclo anterior inteiro mesmo navegando ~2 semanas para trás
 SAIDA = os.path.join(os.path.dirname(__file__), "..", "dados.js")
 
 KEY = os.environ.get("REZDY_API_KEY") or os.environ.get("REZDY_KEY")
-SENHA = os.environ.get("SENHA_PAINEL") or ""
 if not KEY:
     sys.exit("REZDY_API_KEY não definido")
-if not SENHA:
-    sys.exit("SENHA_PAINEL não definido: valores não serão gravados em texto aberto")
 
 
 def get(endpoint, params):
@@ -89,12 +80,7 @@ for b in bookings:
 linhas.sort(key=lambda r: (r["d"], r["h"]))
 
 dados = {"desde": str(desde), "atualizado": agora.strftime("%Y-%m-%d %H:%M"), "r": linhas}
-sal, iv, it = os.urandom(16), os.urandom(12), 310000
-chave = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=sal, iterations=it).derive(SENHA.encode())
-ct = AESGCM(chave).encrypt(iv, json.dumps(dados, ensure_ascii=False, separators=(",", ":")).encode(), None)
-b64 = lambda x: base64.b64encode(x).decode()
 with open(SAIDA, "w", encoding="utf-8") as f:
     f.write("// GERADO POR scripts/sync.py: não editar à mão\n")
-    f.write(f"const ATUALIZADO={json.dumps(dados['atualizado'])};\n")
-    f.write("const COFRE=" + json.dumps({"salt": b64(sal), "iv": b64(iv), "it": it, "ct": b64(ct)}) + ";\n")
+    f.write("const DADOS=" + json.dumps(dados, ensure_ascii=False, separators=(",", ":")) + ";\n")
 print(f"{len(linhas)} reservas confirmadas desde {desde} · atualizado {dados['atualizado']}")

@@ -97,14 +97,6 @@ header h1 span { color: var(--ink-3); font-weight: 500; }
 .ext .lin .t { grid-column: 1 / -1; height: 6px; background: var(--track); border-radius: 4px; overflow: hidden; }
 .ext .lin .t div { height: 100%; background: var(--s1); border-radius: 4px; }
 
-/* senha */
-#porta { min-height: 80vh; display: grid; place-items: center; }
-#porta form { width: 100%; max-width: 340px; display: grid; gap: 12px; }
-#porta input[type=password] { font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
-#porta button { background: var(--ink); color: var(--card); border: 0; border-radius: 8px; padding: 10px; font-weight: 600; }
-#porta .erro { color: var(--bad); font-size: .85rem; min-height: 1.2em; }
-#porta label { display: flex; gap: 8px; align-items: center; font-size: .85rem; color: var(--ink-2); }
-
 .dois > #x-card { grid-column: 1 / -1; }
 
 /* telas largas (monitor/TV): ocupa a tela inteira, sem rolagem */
@@ -135,20 +127,7 @@ header h1 span { color: var(--ink-3); font-weight: 500; }
 </head>
 <body>
 <main>
-  <section id="porta">
-    <form class="card" id="fporta">
-      <div>
-        <div style="font-weight:600">Vendas do dia · Vertical Rio</div>
-        <div class="muted">Os valores são protegidos. Digite a senha para abrir.</div>
-      </div>
-      <input id="senha" type="password" autocomplete="current-password" placeholder="Senha" required>
-      <label><input type="checkbox" id="lembrar"> Lembrar neste aparelho</label>
-      <button>Abrir</button>
-      <div class="erro" id="erro"></div>
-    </form>
-  </section>
-
-  <section id="painel" hidden>
+  <section id="painel">
     <header>
       <h1>Vendas do dia <span>· Vertical Rio</span></h1>
       <div class="nav">
@@ -195,7 +174,6 @@ header h1 span { color: var(--ink-3); font-weight: 500; }
 </main>
 
 <script>
-const CHAVE_LS = 'vendasdia_senha';
 const ORIGENS = [['ONLINE', 'Online', '--s1'], ['INTERNAL', 'Interno', '--s2'], ['MARKETPLACE', 'Marketplace', '--s3']];
 const DSEM = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
 const MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -325,41 +303,19 @@ function renderExtras() {
     : '<div class="muted">Nenhum extra vendido no período.</div>';
 }
 
-// ── senha ────────────────────────────────────────────────────────────────────
+// ── dados ────────────────────────────────────────────────────────────────────
 // baixa sempre a versão mais nova de dados.js (o GitHub Pages deixa o navegador guardar em cache)
-async function baixar() {
+async function carregar() {
   const t = await (await fetch('dados.js?t=' + Date.now(), { cache: 'no-store' })).text();
-  return JSON.parse(t.match(/const COFRE=(\{.*\});/)[1]);
-}
-
-let SENHA = null;
-async function abrir(senha, COFRE) {
-  COFRE = COFRE || await baixar();
-  const b = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
-  const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(senha), 'PBKDF2', false, ['deriveKey']);
-  const k = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b(COFRE.salt), iterations: COFRE.it, hash: 'SHA-256' },
-    km, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
-  const dados = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b(COFRE.iv) }, k, b(COFRE.ct))));
+  const dados = JSON.parse(t.match(/const DADOS=(\{.*\});/)[1]);
   const ultAnt = ULT;
-  R = dados.r; DESDE = dados.desde; SENHA = senha;
+  R = dados.r; DESDE = dados.desde;
   [ULT, CORTE] = dados.atualizado.split(' ');
   if (!D || D === ultAnt) D = ULT;   // na atualização automática, mantém o dia que está sendo visto
   document.getElementById('atualizado').textContent = `Dados de ${fCurto(ULT)} às ${CORTE}.`;
-  document.getElementById('porta').hidden = true;
-  document.getElementById('painel').hidden = false;
   render();
 }
 
-document.getElementById('fporta').addEventListener('submit', async ev => {
-  ev.preventDefault();
-  const senha = document.getElementById('senha').value;
-  try {
-    await abrir(senha);
-    if (document.getElementById('lembrar').checked) try { localStorage.setItem(CHAVE_LS, senha); } catch (e) {}
-  } catch (e) {
-    document.getElementById('erro').textContent = 'Senha incorreta.';
-  }
-});
 document.getElementById('ant').onclick = () => { D = addD(D, -1); render(); };
 document.getElementById('prox').onclick = () => { D = addD(D, 1); render(); };
 document.getElementById('tela').onclick = () => document.documentElement.requestFullscreen?.();
@@ -372,16 +328,8 @@ document.getElementById('x-seg').onclick = ev => {
 };
 
 // atualização automática a cada 5 min (para deixar aberto na TV)
-setInterval(async () => {
-  if (!SENHA) return;
-  try { await abrir(SENHA); } catch (e) {}
-}, 5 * 60 * 1000);
-
-(async () => {
-  let salva = null;
-  try { salva = localStorage.getItem(CHAVE_LS); } catch (e) {}
-  if (salva) try { await abrir(salva); } catch (e) { try { localStorage.removeItem(CHAVE_LS); } catch (e2) {} }
-})();
+carregar();
+setInterval(() => carregar().catch(() => {}), 5 * 60 * 1000);
 </script>
 </body>
 </html>
