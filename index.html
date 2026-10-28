@@ -105,6 +105,27 @@ header h1 span { color: var(--ink-3); font-weight: 500; }
 #porta .erro { color: var(--bad); font-size: .85rem; min-height: 1.2em; }
 #porta label { display: flex; gap: 8px; align-items: center; font-size: .85rem; color: var(--ink-2); }
 
+.dois > #x-card { grid-column: 1 / -1; }
+
+/* telas largas (monitor/TV): ocupa a tela inteira, sem rolagem */
+@media (min-width: 1000px) and (min-height: 600px) {
+  html { font-size: clamp(15px, 1.75vh, 26px); }
+  main { max-width: none; height: 100vh; padding: 2.5vh 2.5vw; }
+  #painel:not([hidden]) { display: flex; flex-direction: column; gap: 1.6vh; height: 100%; }
+  header, .resumo { margin: 0; }
+  .hero { flex: 1.3; min-height: 0; }
+  .dois { flex: 1.2; min-height: 0; margin: 0; grid-template-columns: 1fr 1fr 1.15fr; }
+  .card { display: flex; flex-direction: column; justify-content: center; padding: 2.2vh 1.6vw; }
+  .hero .card { justify-content: space-between; }
+  .dois .card { justify-content: flex-start; }
+  .hero .card:first-child .valor { font-size: 4rem; }
+  .valor { font-size: 2.4rem; }
+  .dois > #x-card { grid-column: auto; justify-content: flex-start; overflow: auto; }
+  .nota { margin: 0; font-size: .7rem; }
+}
+#tela { font-size: .8rem; }
+:fullscreen #tela, :fullscreen .nota { display: none; }
+
 @media (max-width: 640px) {
   .hero, .dois { grid-template-columns: 1fr; }
   .hero .card:first-child .valor { font-size: 2.2rem; }
@@ -135,6 +156,7 @@ header h1 span { color: var(--ink-3); font-weight: 500; }
         <div class="dia" id="dia"></div>
         <button id="prox" aria-label="Próximo dia">›</button>
         <button id="hoje">Hoje</button>
+        <button id="tela" title="Tela cheia">⛶ Tela cheia</button>
       </div>
     </header>
 
@@ -154,9 +176,7 @@ header h1 span { color: var(--ink-3); font-weight: 500; }
     <div class="dois">
       <div class="card" id="c-semana"></div>
       <div class="card" id="c-ciclo"></div>
-    </div>
-
-    <div class="card">
+      <div class="card" id="x-card">
       <div class="titulo">
         <div class="label">Extras mais vendidos</div>
         <div class="seg" id="x-seg">
@@ -164,9 +184,10 @@ header h1 span { color: var(--ink-3); font-weight: 500; }
         </div>
       </div>
       <div class="ext" id="x-lista"></div>
+      </div>
     </div>
 
-    <p class="muted" style="margin-top:16px">
+    <p class="muted nota" style="margin-top:16px">
       Reservas confirmadas, pela data em que foram feitas. Bruta = valor total da reserva · Líquida = bruta − cortesias (FOC) − cupons · Extras = Shoe-Selfie Pass, GoPro, 360º etc.
       Comparações até o mesmo horário do período anterior. Ciclo = dia 26 a 25. <span id="atualizado"></span>
     </p>
@@ -333,6 +354,7 @@ document.getElementById('fporta').addEventListener('submit', async ev => {
 });
 document.getElementById('ant').onclick = () => { D = addD(D, -1); render(); };
 document.getElementById('prox').onclick = () => { D = addD(D, 1); render(); };
+document.getElementById('tela').onclick = () => document.documentElement.requestFullscreen?.();
 document.getElementById('hoje').onclick = () => { D = ULT; render(); };
 document.getElementById('x-seg').onclick = ev => {
   const p = ev.target.dataset.p; if (!p) return;
