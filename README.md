@@ -10,3 +10,10 @@ semana e ciclo (26→25) comparados com o período anterior até o mesmo horári
 
 Regras: Bruta = valor total da reserva · Líquida = bruta − cortesias (FOC) − cupons ·
 Origem = campo `source` do Rezdy (INTERNAL = interno; MARKETPLACE_* = marketplace; o resto = online).
+
+## E-mail diário
+
+`scripts/email_resumo.py` monta o resumo do dia anterior (mesmas regras do painel) e envia por SMTP do Gmail.
+Action `email.yml` roda todo dia às 08:00 (Rio). Secrets: `SMTP_USER` (conta Google que envia),
+`SMTP_PASS` (senha de app dessa conta), `EMAIL_PARA` (destinatários, separados por vírgula).
+Prévia sem enviar: `python scripts/email_resumo.py --preview resumo.html`.
